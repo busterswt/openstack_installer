@@ -24,6 +24,14 @@ if [ $1 != "auto" ]; then
    read -n1 -rsp "Press any key to continue or control-c to cancel..." key
 fi
 
+# Remove LinuxBridge agent
+apt-get -y remove --pugre neutron-plugin-linuxbridge-agent
+
+# Remove OVS
+apt-get -y remove --purge neutron-plugin-openvswitch-agent openvswitch-switch
+apt-get clean
+apt-get -y autoremove
+
 # Install LinuxBridge (Controller Only)
 apt-get -y install neutron-plugin-linuxbridge-agent
 
