@@ -50,6 +50,10 @@ crudini --set /etc/nova/nova.conf DEFAULT novncproxy_base_url http://controller0
 crudini --set /etc/nova/nova.conf glance host controller01
 crudini --set /etc/nova/nova.conf oslo_concurrency lock_path /var/lib/nova/tmp
 
+# Configure Nova for QEMU (emulation)
+crudini --set /etc/nova/nova.conf DEFAULT compute_driver libvirt.LibvirtDriver
+crudini --set /etc/nova/nova.conf libvirt virt_type qemu
+
 # Restart Nova
 service nova-compute restart
 
