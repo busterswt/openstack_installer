@@ -19,8 +19,9 @@ This script will install and configure the Open vSwitch agent and should only be
 
 ###############################################################################################################"
 echo;
-read -n1 -rsp "Press any key to continue or control-c to cancel..." key
-
+if [ $1 != "auto" ]; then
+   read -n1 -rsp "Press any key to continue or control-c to cancel..." key
+fi
 # Remove LinuxBridge agent
 apt-get -y remove --pure neutron-plugin-linuxbridge-agent
 
