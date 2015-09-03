@@ -15,16 +15,14 @@ fi
 echo;
 echo "##############################################################################################################
 
-This script will install and configure the LinuxBridge agent and should only be executed on the controller node
+This script will install and configure the LinuxBridge agent and should only be executed on the compute node
 
 ###############################################################################################################"
 echo;
-
 if [ $1 != "auto" ]; then
    read -n1 -rsp "Press any key to continue or control-c to cancel..." key
 fi
-
-# Install LinuxBridge (Controller Only)
+# Install LinuxBridge (Compute Only)
 apt-get -y install neutron-plugin-linuxbridge-agent
 
 # Configure ML2 plugin
@@ -40,14 +38,9 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini linux_bridge physical_interf
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT linuxnet_interface_driver linuxnet_interface_driver=nova.network.linux_net.LinuxBridgeInterfaceDriver
 
-# Configure DHCP agent
-crudini --set /etc/neutron/dhcp_agent.ini DEFAULT interface_driver neutron.agent.linux.interface.BridgeInterfaceDriver
-
 # Restart services
 service neutron-plugin-linuxbridge-agent restart
-service nova-api restart
-service neutron-server restart
-service neutron-dhcp-agent restart
+service nova-compute restart
 
 echo;
 echo "##############################################################################################################
