@@ -19,7 +19,10 @@ This script will install and configure the LinuxBridge agent and should only be 
 
 ###############################################################################################################"
 echo;
-read -n1 -rsp "Press any key to continue or control-c to cancel..." key
+
+if [ $1 != "auto" ]; then
+   read -n1 -rsp "Press any key to continue or control-c to cancel..." key
+fi
 
 # Install LinuxBridge (Controller Only)
 apt-get -y install neutron-plugin-linuxbridge-agent
