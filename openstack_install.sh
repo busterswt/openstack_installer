@@ -10,7 +10,7 @@ function cleanup {
 trap cleanup SIGHUP SIGINT SIGTERM
 
 PS3='Please enter your choice: '
-options=("Install Prerequisites" "Automated Controller Node Installation (LinuxBridge)" "Automated Compute Node Installation (LinuxBridge)" "Install Database Server (Warning: Destroys Existing Cloud)" "Install Keystone (Warning: Destroys existing Keystone DB)" "Install Glance" "Install Nova Components (Controller Only)" "Install Neutron Components (Controller Only)" "Quit")
+options=("Install Prerequisites" "Automated Controller Node Installation (LinuxBridge)" "Automated Controller Node Installation (Open vSwitch)" "Automated Compute Node Installation (LinuxBridge)" "Automated Compute Node Installation (Open vSwitch)" "Install Database Server (Warning: Destroys Existing Cloud)" "Install Keystone (Warning: Destroys existing Keystone DB)" "Install Glance" "Install Nova Components (Controller Only)" "Install Neutron Components (Controller Only)" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -30,10 +30,28 @@ do
            sudo /bin/bash ~/openstack_installer/openstack_neutron_controller_lb.sh auto
            break
            ;;
+        "Automated Controller Node Installation (Open vSwitch)")
+           read -n1 -resp $'\nThis will kickoff an unattended installation on the controller node.\n\n Press any key to continue or control-c to cancel...\n' key
+           sudo /bin/bash ~/openstack_installer/openstack_amqp.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_mysql.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_keystone.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_glance.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_nova_controller.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_dashboard.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_neutron_controller.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_neutron_controller_ovs.sh auto
+           break
+           ;;
         "Automated Compute Node Installation (LinuxBridge)")
            read -n1 -resp $'\nThis will kickoff an unattended installation on a compute node.\n\n Press any key to continue or control-c to cancel...\n' key
            sudo /bin/bash ~/openstack_installer/openstack_nova_compute.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_compute_lb.sh auto
+           break
+           ;;
+        "Automated Compute Node Installation (Open vSwitch)")
+           read -n1 -resp $'\nThis will kickoff an unattended installation on a compute node.\n\n Press any key to continue or control-c to cancel...\n' key
+           sudo /bin/bash ~/openstack_installer/openstack_nova_compute.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_neutron_compute_ovs.sh auto
            break
            ;;
         "Install Database Server (Warning: Destroys Existing Cloud)")
