@@ -23,7 +23,7 @@ if [ $1 != "auto" ]; then
    read -n1 -rsp "Press any key to continue or control-c to cancel..." key
 fi
 # Install Nova (Compute Only)
-apt-get -y install nova-compute sysfsutils
+apt-get -y install nova-compute sysfsutils qemu-kvm
 
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT auth_strategy keystone
