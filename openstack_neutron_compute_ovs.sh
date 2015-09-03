@@ -15,7 +15,7 @@ fi
 echo;
 echo "##############################################################################################################
 
-This script will install and configure the Open vSwitch agent and should only be executed on the controller node
+This script will install and configure the Open vSwitch agent and should only be executed on the compute node
 
 ###############################################################################################################"
 echo;
@@ -31,7 +31,7 @@ apt-get clean
 apt-get -y autoremove
 rm -f /var/lib/openvswitch/conf.db
 
-# Install OVS (Controller Only)
+# Install OVS (Compute Only)
 apt-get -y install neutron-plugin-openvswitch-agent bridge-utils
 
 # Configure ML2 plugin
@@ -48,9 +48,6 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent tunnel_types vxlan
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT linuxnet_interface_driver nova.network.linux_net.LinuxOVSInterfaceDriver
 
-# Configure DHCP agent
-crudini --set /etc/neutron/dhcp_agent.ini DEFAULT interface_driver neutron.agent.linux.interface.OVSInterfaceDriver
-
 # Configure OVS Bridge
 ovs-vsctl add-br br-eth1
 ovs-vsctl add-port br-eth1 eth1
@@ -58,13 +55,11 @@ ovs-vsctl add-port br-eth1 eth1
 # Configure OVS
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS enable_tunneling true
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS tunnel_type vxlan
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS local_ip 172.18.0.100
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS local_ip $(ip r | grep 172.18.0 | awk {'print $9'})
 
 # Restart services
 service neutron-plugin-openvswitch-agent restart
-service nova-api restart
-service neutron-server restart
-service neutron-dhcp-agent restart
+service nova-compute restart
 
 echo;
 echo "##############################################################################################################

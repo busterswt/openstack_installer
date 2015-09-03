@@ -25,7 +25,7 @@ if [ $1 != "auto" ]; then
 fi
 
 # Remove LinuxBridge agent
-apt-get -y remove --pugre neutron-plugin-linuxbridge-agent
+apt-get -y remove --purge neutron-plugin-linuxbridge-agent
 
 # Remove OVS
 apt-get -y remove --purge neutron-plugin-openvswitch-agent openvswitch-switch
