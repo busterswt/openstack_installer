@@ -126,8 +126,8 @@ service neutron-dhcp-agent restart
 # Configure Metadata
 METADATA_SECRET=insecuresecret123
 
-crudini --set /etc/nova/nova.conf DEFAULT metadata_proxy_shared_secret $METADATA_SECRET
-crudini --set /etc/nova/nova.conf DEFAULT service_metadata_proxy true
+crudini --set /etc/nova/nova.conf neutron metadata_proxy_shared_secret $METADATA_SECRET
+crudini --set /etc/nova/nova.conf neutron service_metadata_proxy true
 
 crudini --set /etc/neutron/metadata_agent.ini DEFAULT auth_uri http://controller01:5000
 crudini --set /etc/neutron/metadata_agent.ini DEFAULT auth_url http://controller01:35357
