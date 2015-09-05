@@ -43,6 +43,21 @@ service ntp restart
 apt update
 apt -y dist-upgrade
 
+# Update /etc/hosts
+cat > /etc/hosts <<EOF
+127.0.0.1	localhost
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+# OpenStack Hosts
+10.254.254.100 controller01.learningneutron.com controller01
+10.254.254.101 compute01.learningneutron.com compute01
+10.254.254.102 compute02.learningneutron.com compute02
+EOF
+
 echo;
 echo "##############################################################################################################
 
