@@ -75,7 +75,7 @@ crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
 crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router
 
 # Restart services
-service neutron-compute restart
+service nova-compute restart
 
 echo;
 echo "##############################################################################################################
