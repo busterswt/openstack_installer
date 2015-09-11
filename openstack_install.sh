@@ -28,6 +28,7 @@ do
 	   sudo /bin/bash ~/openstack_installer/openstack_dashboard.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_controller.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_controller_lb.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_neutron_l3_controller_lb.sh auto
            break
            ;;
         "Automated Controller Node Installation (Open vSwitch)")
@@ -40,6 +41,7 @@ do
            sudo /bin/bash ~/openstack_installer/openstack_dashboard.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_controller.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_controller_ovs.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_neutron_l3_controller_ovs.sh auto
            break
            ;;
         "Automated Compute Node Installation (LinuxBridge)")
