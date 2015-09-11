@@ -39,6 +39,7 @@ mysql -u root -popenstack -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhos
 mysql -u root -popenstack -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'nova';"
 
 # Configure Nova
+crudini --set /etc/nova/nova.conf database connection mysql://nova:nova@controller01/nova
 crudini --set /etc/nova/nova.conf DEFAULT rpc_backend rabbit
 crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_host controller01
 crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_userid openstack
