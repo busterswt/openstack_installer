@@ -45,12 +45,14 @@ do
         "Automated Compute Node Installation (LinuxBridge)")
            read -n1 -resp $'\nThis will kickoff an unattended installation on a compute node.\n\n Press any key to continue or control-c to cancel...\n' key
            sudo /bin/bash ~/openstack_installer/openstack_nova_compute.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_neutron_compute.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_compute_lb.sh auto
            break
            ;;
         "Automated Compute Node Installation (Open vSwitch)")
            read -n1 -resp $'\nThis will kickoff an unattended installation on a compute node.\n\n Press any key to continue or control-c to cancel...\n' key
            sudo /bin/bash ~/openstack_installer/openstack_nova_compute.sh auto
+           sudo /bin/bash ~/openstack_installer/openstack_neutron_compute.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_compute_ovs.sh auto
            break
            ;;
