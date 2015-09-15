@@ -35,6 +35,9 @@ echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu" "trusty-updates/kilo
 # Install Crudini
 apt -y install crudini
 
+# Install curl
+apt -y install curl
+
 # install time server
 apt install ntp -y
 service ntp restart
