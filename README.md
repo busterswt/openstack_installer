@@ -7,10 +7,13 @@ Certain pre-work must be done to the hosts to ensure a smooth installation.
 Set the hostname of each machine (must reboot to take effect):
 
 ```
-hostnamectl set-hostname controller01.learningneutron.com
-hostnamectl set-hostname compute01.learningneutron.com
-hostnamectl set-hostname compute02.learningneutron.com
+sudo hostnamectl set-hostname controller01.learningneutron.com
+sudo hostnamectl set-hostname compute01.learningneutron.com
+sudo hostnamectl set-hostname compute02.learningneutron.com
 ```
+
+You must logout and log back in for changes to take effect.
+
 ---
 To use, execute the following on each host:
 
