@@ -12,6 +12,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# load the config.ini INI file to current BASH - quoted to preserve line breaks
+eval "$(cat config.ini  | ./scripts/ini2arr.py)"
+
 echo;
 echo "##############################################################################################################
 
@@ -56,9 +59,9 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 
 # OpenStack Hosts
-10.254.254.100 controller01.learningneutron.com controller01
-10.254.254.101 compute01.learningneutron.com compute01
-10.254.254.102 compute02.learningneutron.com compute02
+$(echo ${controller01[mgmt_addr]}) controller01.learningneutron.com controller01
+$(echo ${compute01[mgmt_addr]}) compute01.learningneutron.com compute01
+$(echo ${compute02[mgmt_addr]}) compute02.learningneutron.com compute02
 EOF
 
 echo;

@@ -12,6 +12,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# load the config.ini INI file to current BASH - quoted to preserve line breaks
+eval "$(cat config.ini  | ./scripts/ini2arr.py)"
+
 echo;
 echo "##############################################################################################################
 
@@ -73,7 +76,7 @@ crudini --set /etc/neutron/neutron.conf oslo_messaging_rabbit rabbit_host contro
 crudini --set /etc/neutron/neutron.conf oslo_messaging_rabbit rabbit_userid openstack
 crudini --set /etc/neutron/neutron.conf oslo_messaging_rabbit rabbit_password rabbit
 
-crudini --set /etc/neutron/neutron.conf DEFAULT bind_host $(ip r | grep 10.254.254 | awk {'print $9'})
+crudini --set /etc/neutron/neutron.conf DEFAULT bind_host $(echo ${controller01[mgmt_addr]})
 
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT network_api_class nova.network.neutronv2.api.API

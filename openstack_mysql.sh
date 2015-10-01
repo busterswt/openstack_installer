@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# load the config.ini INI file to current BASH - quoted to preserve line breaks
+eval "$(cat config.ini  | ./scripts/ini2arr.py)"
+
 function cleanup {
    reset
    exit
@@ -36,7 +39,7 @@ apt -y install mariadb-server python-mysqldb
 # Configure MySQL
 cat > /etc/mysql/conf.d/mysqld_openstack.cnf <<EOF
 [mysqld]
-bind-address = 10.254.254.100
+bind-address = $(echo ${controller01[mgmt_addr]})
 default-storage-engine = innodb
 innodb_file_per_table
 collation-server = utf8_general_ci
