@@ -18,6 +18,9 @@ You must logout and log back in for changes to take effect.
 To use, execute the following on each host:
 
 ```
+# May need to add key with the following command:
+# sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 16126D3A3E5C1192
+
 sudo apt-get -y update
 sudo apt -y install software-properties-common git
 cd ~
