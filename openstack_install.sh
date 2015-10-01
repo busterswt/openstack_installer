@@ -30,8 +30,14 @@ do
            sudo /bin/bash ~/openstack_installer/openstack_nova_controller.sh auto
 	   sudo /bin/bash ~/openstack_installer/openstack_dashboard.sh auto
            sudo /bin/bash ~/openstack_installer/openstack_neutron_controller.sh auto
-#           sudo /bin/bash ~/openstack_installer/openstack_neutron_controller_lb.sh auto
-#           sudo /bin/bash ~/openstack_installer/openstack_neutron_l3_controller_lb.sh auto
+           if  [ $(echo ${network[vswitch]}) == "linuxbridge" ]; then
+             sudo /bin/bash ~/openstack_installer/openstack_neutron_controller_lb.sh auto
+           elif [ $(echo ${network[vswitch]}) == "ovs" ]; then
+             sudo /bin/bash ~/openstack_installer/openstack_neutron_l3_controller_lb.sh auto
+           else
+             echo "vswitch not configured. Please set config.ini and run again"
+             break
+           fi
            break
            ;;
         "Automated Compute Node Installation (LinuxBridge)")
