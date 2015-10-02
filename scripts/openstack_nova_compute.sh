@@ -12,6 +12,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# load the config.ini INI file to current BASH - quoted to preserve line breaks
+eval "$(cat config.ini  | ./scripts/ini2arr.py)"
+
 echo;
 echo "##############################################################################################################
 
@@ -41,8 +44,12 @@ crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_host controller01
 crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_userid openstack
 crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_password rabbit
 
-crudini --set /etc/nova/nova.conf DEFAULT my_ip $(ip r | grep 10.254.254 | awk {'print $9'})
-crudini --set /etc/nova/nova.conf DEFAULT vncserver_proxyclient_address $(ip r | grep 10.254.254 | awk {'print $9'})
+#Grab my IP
+MY_NAME=$(hostname -s)
+MY_MGMT_IP=$MY_NAME[mgmt_addr]
+
+crudini --set /etc/nova/nova.conf DEFAULT my_ip $(echo "${!MY_MGMT_IP}")
+crudini --set /etc/nova/nova.conf DEFAULT vncserver_proxyclient_address $(echo "${!MY_MGMT_IP}")
 crudini --set /etc/nova/nova.conf DEFAULT vnc_enabled True
 crudini --set /etc/nova/nova.conf DEFAULT vncserver_listen 0.0.0.0
 crudini --set /etc/nova/nova.conf DEFAULT novncproxy_base_url http://controller01:6080/vnc_auto.html
