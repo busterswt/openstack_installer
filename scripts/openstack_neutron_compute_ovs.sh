@@ -12,6 +12,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# load the config.ini INI file to current BASH - quoted to preserve line breaks
+eval "$(cat config.ini  | ./scripts/ini2arr.py)"
+
 echo;
 echo "##############################################################################################################
 
@@ -22,14 +25,6 @@ echo;
 if [ $1 != "auto" ]; then
    read -n1 -rsp "Press any key to continue or control-c to cancel..." key
 fi
-# Remove LinuxBridge agent
-apt-get -y remove --purge neutron-plugin-linuxbridge-agent
-
-# Remove OVS
-apt-get -y remove --purge neutron-plugin-openvswitch-agent openvswitch-switch
-apt-get clean
-apt-get -y autoremove
-rm -f /var/lib/openvswitch/conf.db
 
 # Install OVS (Compute Only)
 apt-get -y install neutron-plugin-openvswitch-agent bridge-utils
@@ -39,23 +34,27 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 type_drivers local,flat,
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 mechanism_drivers openvswitch,l2population
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 tenant_network_types vlan,vxlan
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_flat flat_networks physnet1
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vlan network_vlan_ranges physnet1:30:33
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vlan network_vlan_ranges physnet1:$(echo ${network[tenant_vlan_range]})
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vxlan vni_ranges 1:1000
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS bridge_mappings physnet1:br-eth1
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS bridge_mappings physnet1:$(echo ${network[ovs_bridge_name]})
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent tunnel_types vxlan
 
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT linuxnet_interface_driver nova.network.linux_net.LinuxOVSInterfaceDriver
 
 # Configure OVS Bridge
-ovs-vsctl add-br br-eth1
-ovs-vsctl add-port br-eth1 eth1
+ovs-vsctl add-br $(echo ${network[ovs_bridge_name]})
+ovs-vsctl add-port $(echo ${network[ovs_bridge_name]}) $(echo ${network[physical_bridge_interface]})
+
+#Grab my IP
+MY_NAME=$(hostname -s)
+MY_OVERLAY_IP=$MY_NAME[overlay_addr]
 
 # Configure OVS
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS enable_tunneling true
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS tunnel_type vxlan
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS local_ip $(ip r | grep 172.18.0 | awk {'print $9'})
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini OVS local_ip $(echo "${!MY_OVERLAY_IP}")
 
 # Restart services
 service neutron-plugin-openvswitch-agent restart

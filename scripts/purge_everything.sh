@@ -38,7 +38,7 @@ done ;
 echo "Removing packages..."
 apt-get -y remove --purge 'ntp.*' 'openstack.*' \
 'nova.*' 'keystone.*' 'glance.*' 'rabbit.*' \
-'neutron.*' 'mysql.*' 'maria.*' 'mysql-server.*' 'apache2.*' 'memcache.*' ;
+'neutron.*' 'mysql.*' 'maria.*' 'mysql-server.*' 'apache2.*' 'memcache.*' 'openvswitch.*' ;
 apt-get clean
 apt-get -y autoremove
 
@@ -46,7 +46,8 @@ apt-get -y autoremove
 echo "Deleting files..."
 rm -rf /root/.my.cnf /var/lib/mysql/ /var/lib/glance /var/lib/nova /var/lib/neutron /var/lib/openstack-dashboard \
 /var/log/keystone /var/log/neutron/ /var/log/apache2 /var/log/glance/ /var/log/neutron/ /usr/share/openstack-dashboard/ \
-/etc/neutron /etc/nova /etc/keystone /etc/glance /etc/openstack-dashboard /etc/mysql /etc/rabbitmq /etc/apache2;
+/etc/neutron /etc/nova /etc/keystone /etc/glance /etc/openstack-dashboard/ /etc/mysql/ /etc/rabbitmq/ /etc/apache2/ \
+/var/lib/openvswitch/ ;
 
 # Remove install file
 rm /var/lib/openstack_installer/installed

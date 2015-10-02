@@ -58,7 +58,7 @@ crudini --set /etc/nova/nova.conf glance host controller01
 crudini --set /etc/nova/nova.conf oslo_concurrency lock_path /var/lib/nova/tmp
 
 # Configure Nova for QEMU (emulation)
-crudini --set /etc/nova/nova-compute.conf libvirt virt_type qemu
+crudini --set /etc/nova/nova-compute.conf libvirt virt_type $(echo ${virt[virt_type]})
 
 # Restart Nova
 service nova-compute restart
