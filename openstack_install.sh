@@ -55,16 +55,28 @@ do
            break
            ;;
         "Automated Compute Node Installation")
-           read -n1 -resp $'\nThis will kickoff a (mostly) unattended installation on a compute node.\n\n Press any key to continue or control-c to cancel...\n' key
-           sudo /bin/bash ./scripts/openstack_nova_compute.sh auto
-           sudo /bin/bash ./scripts/openstack_neutron_compute.sh auto
-           if  [ $(echo ${network[vswitch]}) == "linuxbridge" ]; then
-             sudo /bin/bash ./scripts/openstack_neutron_compute_lb.sh auto
-           elif [ $(echo ${network[vswitch]}) == "ovs" ]; then
-             sudo /bin/bash ./scripts/openstack_neutron_compute_ovs.sh auto
-           else
-             echo "vswitch not configured. Please set config.ini and run again"
+           read -n1 -resp $'\nThis will kickoff a (mostly) unattended installation on a compute node.\nA controller node should already be in place.\n\n Press any key to continue or control-c to cancel...\n' key
+
+           # Check for install file
+           if [ -f /var/lib/openstack_installer/installed ]; then
+             echo "Existing installation found! Please run the uninstaller and try again."
              break
+           else
+             # Create a file so we know some components are installed
+             mkdir /var/lib/openstack_installer/
+             touch /var/lib/openstack_installer/installed
+
+
+             sudo /bin/bash ./scripts/openstack_nova_compute.sh auto
+             sudo /bin/bash ./scripts/openstack_neutron_compute.sh auto
+             if  [ $(echo ${network[vswitch]}) = "linuxbridge" ]; then
+               sudo /bin/bash ./scripts/openstack_neutron_compute_lb.sh auto
+             elif [ $(echo ${network[vswitch]}) = "ovs" ]; then
+               sudo /bin/bash ./scripts/openstack_neutron_compute_ovs.sh auto
+             else
+               echo "vswitch not configured. Please set config.ini and run again"
+               break
+             fi
            fi
            break
            ;;

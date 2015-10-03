@@ -27,14 +27,6 @@ if [ $1 != "auto" ]; then
    read -n1 -rsp "Press any key to continue or control-c to cancel..." key
 fi
 
-# Remove LinuxBridge agent
-apt-get -y remove --purge neutron-plugin-linuxbridge-agent
-
-# Remove OVS
-apt-get -y remove --purge neutron-plugin-openvswitch-agent openvswitch-switch
-apt-get clean
-apt-get -y autoremove
-
 # Install LinuxBridge (Controller Only)
 apt-get -y install neutron-plugin-linuxbridge-agent
 
@@ -47,6 +39,9 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vlan network_vlan_r
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vxlan vni_ranges 1:1000
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini linux_bridge physical_interface_mappings physnet1:$(echo ${network[physical_bridge_interface]})
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent enable_vxlan True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent l2_population True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent local_ip $(echo ${controller01[mgmt_addr]})
 
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT linuxnet_interface_driver linuxnet_interface_driver=nova.network.linux_net.LinuxBridgeInterfaceDriver
