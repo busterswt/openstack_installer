@@ -42,9 +42,9 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini linux_bridge physical_interf
 MY_NAME=$(hostname -s)
 MY_OVERLAY_IP=$MY_NAME[overlay_addr]
 
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent enable_vxlan True
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent l2_population True
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent local_ip $(echo "${!MY_OVERLAY_IP}")
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini vxlan enable_vxlan True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini vxlan l2_population True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini vxlan local_ip $(echo "${!MY_OVERLAY_IP}")
 
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT linuxnet_interface_driver linuxnet_interface_driver=nova.network.linux_net.LinuxBridgeInterfaceDriver

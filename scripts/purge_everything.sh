@@ -53,5 +53,16 @@ rm -rf /root/.my.cnf /var/lib/mysql/ /var/lib/glance /var/lib/nova /var/lib/neut
 rm /var/lib/openstack_installer/installed
 rm -rf /var/lib/openstack_installer/
 
+echo;
+echo "##############################################################################################################
+
+OpenStack and (most of) its dependencies have been uninstalled. 
+
+Please reboot this machine before proceeding with a new installation to avoid issues with hanging processes.
+
+###############################################################################################################"
+echo;
+
+
 # End
 exit
