@@ -45,6 +45,8 @@ innodb_file_per_table
 collation-server = utf8_general_ci
 init-connect = "SET NAMES utf8"
 character-set-server = utf8
+max_connections = 512
+skip-name-resolve
 EOF
 
 service mysql restart
