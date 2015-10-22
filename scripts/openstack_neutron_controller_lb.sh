@@ -41,7 +41,7 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_drive
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini linux_bridge physical_interface_mappings physnet1:$(echo ${network[physical_bridge_interface]})
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini vxlan enable_vxlan True
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini vxlan l2_population True
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini vxlan local_ip $(echo ${controller01[mgmt_addr]})
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini vxlan local_ip $(echo ${controller01[overlay_addr]})
 
 # Configure Nova
 crudini --set /etc/nova/nova.conf DEFAULT linuxnet_interface_driver linuxnet_interface_driver=nova.network.linux_net.LinuxBridgeInterfaceDriver
