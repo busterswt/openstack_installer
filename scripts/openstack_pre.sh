@@ -30,10 +30,10 @@ read -n1 -rsp "Press any key to continue or control-c to cancel..." key
 apt update
 
 # Install cloud keyring
-apt -y install ubuntu-cloud-keyring
+apt -y install ubuntu-cloud-keyring software-properties-common
 
 # Configure repo
-echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu" "trusty-updates/kilo main" > /etc/apt/sources.list.d/cloudarchive-kilo.list
+add-apt-repository cloud-archive:liberty
 
 # Install Crudini
 apt -y install crudini
@@ -48,6 +48,9 @@ service ntp restart
 # Upgrade the system
 apt update
 apt -y dist-upgrade
+
+# Install OpenStack client
+apt-get -y install python-openstackclient
 
 # Update /etc/hosts
 cat > /etc/hosts <<EOF

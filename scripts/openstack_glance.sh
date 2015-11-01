@@ -37,11 +37,11 @@ mysql -u root -popenstack -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'loca
 mysql -u root -popenstack -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'glance';"
 
 # Configure Glance
-crudini --set /etc/glance/glance-api.conf database connection mysql://glance:glance@controller01/glance
-crudini --set /etc/glance/glance-registry.conf database connection mysql://glance:glance@controller01/glance
+crudini --set /etc/glance/glance-api.conf database connection mysql+pymysql://glance:glance@controller01/glance
+crudini --set /etc/glance/glance-registry.conf database connection mysql+pymysql://glance:glance@controller01/glance
 
 source ~/adminrc
-openstack user create --password glance glance
+openstack user create --domain default --password glance glance
 openstack role add --project service --user glance admin
 
 crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_uri http://controller01:5000/v2.0
@@ -79,12 +79,9 @@ service glance-api restart
 
 # Configure Endpoints
 openstack service create --name glance --description "OpenStack Image service" image
-openstack endpoint create \
-  --publicurl http://controller01:9292 \
-  --internalurl http://controller01:9292 \
-  --adminurl http://controller01:9292 \
-  --region RegionOne \
-  image
+openstack endpoint create --region RegionOne image public http://controller01:9292
+openstack endpoint create --region RegionOne image internal http://controller01:9292
+openstack endpoint create --region RegionOne image admin http://controller01:9292
 
 # Update rc
 echo "export OS_IMAGE_API_VERSION=2" | tee -a ~/adminrc ~/demorc
@@ -104,11 +101,11 @@ glance image-create --name "cirros-0.3.4-x86_64" \
   --visibility public --progress
 
 # Upload Ubuntu Image
-if [ ! -f "/tmp/images/trusty-server-cloudimg-amd64-disk1.img" ]; then
-   wget -P /tmp/images https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
-fi
+#if [ ! -f "/tmp/images/trusty-server-cloudimg-amd64-disk1.img" ]; then
+#   wget -P /tmp/images https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
+#fi
 
-glance image-create --name="Ubuntu 14.04 LTS Cloud Image" --file=/tmp/images/trusty-server-cloudimg-amd64-disk1.img --disk-format qcow2 --container-format bare --visibility public --progress
+#glance image-create --name="Ubuntu 14.04 LTS Cloud Image" --file=/tmp/images/trusty-server-cloudimg-amd64-disk1.img --disk-format qcow2 --container-format bare --visibility public --progress
 
 echo;
 echo "##############################################################################################################

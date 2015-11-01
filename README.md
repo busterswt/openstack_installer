@@ -35,7 +35,7 @@ To use, execute the following on each host:
 ```
 sudo apt -y install software-properties-common git
 cd ~
-git clone https://github.com/busterswt/openstack_installer.git --branch test --single-branch
+git clone https://github.com/busterswt/openstack_installer.git --branch liberty --single-branch
 cd ~/openstack_installer
 sudo ./openstack_install.sh
 ```

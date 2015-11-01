@@ -42,18 +42,18 @@ crudini --set /etc/neutron/neutron.conf database connection mysql://neutron:neut
 
 # Configure Endpoints
 source ~/adminrc
-openstack user create neutron --password neutron
+openstack user create --domain default --password neutron neutron
 openstack role add --project service --user neutron admin
 
 openstack service create --name neutron \
 --description "OpenStack Networking" network
 
-openstack endpoint create \
-    --publicurl http://controller01:9696 \
-    --adminurl http://controller01:9696 \
-    --internalurl http://controller01:9696 \
-    --region RegionOne \
-    network
+openstack endpoint create --region RegionOne \
+  network public http://controller01:9696
+openstack endpoint create --region RegionOne \
+  network internal http://controller01:9696
+openstack endpoint create --region RegionOne \
+  network admin http://controller01:9696
 
 # Configure kernel parameters
 sed -i "/net.ipv4.ip_forward/c\net.ipv4.ip_forward = 1" /etc/sysctl.conf

@@ -41,12 +41,12 @@ rm -f /var/lib/keystone/keystone.db
 
 # Configure Keystone
 ADMIN_TOKEN="insecuretoken123"
-crudini --set /etc/keystone/keystone.conf database connection mysql://keystone:keystone@controller01/keystone
+crudini --set /etc/keystone/keystone.conf database connection mysql+pymysql://keystone:keystone@controller01/keystone
 crudini --set /etc/keystone/keystone.conf memcache servers localhost:11211
 crudini --set /etc/keystone/keystone.conf DEFAULT admin_token insecuretoken123
-crudini --set /etc/keystone/keystone.conf token provider keystone.token.providers.uuid.Provider
-crudini --set /etc/keystone/keystone.conf token driver keystone.token.persistence.backends.memcache.Token
-crudini --set /etc/keystone/keystone.conf revoke driver keystone.contrib.revoke.backends.sql.Revoke
+crudini --set /etc/keystone/keystone.conf token provider uuid
+crudini --set /etc/keystone/keystone.conf token driver memcache
+crudini --set /etc/keystone/keystone.conf revoke driver sql
 
 # Populate Keystone DB
 su -s /bin/sh -c "keystone-manage db_sync" keystone
@@ -57,66 +57,82 @@ Listen 5000
 Listen 35357
 
 <VirtualHost *:5000>
-    WSGIDaemonProcess keystone-public processes=5 threads=1 user=keystone display-name=%{GROUP}
+    WSGIDaemonProcess keystone-public processes=5 threads=1 user=keystone group=keystone display-name=%{GROUP}
     WSGIProcessGroup keystone-public
-    WSGIScriptAlias / /var/www/cgi-bin/keystone/main
+    WSGIScriptAlias / /usr/bin/keystone-wsgi-public
     WSGIApplicationGroup %{GLOBAL}
     WSGIPassAuthorization On
     <IfVersion >= 2.4>
       ErrorLogFormat "%{cu}t %M"
     </IfVersion>
-    LogLevel info
-    ErrorLog /var/log/apache2/keystone-error.log
-    CustomLog /var/log/apache2/keystone-access.log combined
+    ErrorLog /var/log/apache2/keystone.log
+    CustomLog /var/log/apache2/keystone_access.log combined
+
+    <Directory /usr/bin>
+        <IfVersion >= 2.4>
+            Require all granted
+        </IfVersion>
+        <IfVersion < 2.4>
+            Order allow,deny
+            Allow from all
+        </IfVersion>
+    </Directory>
 </VirtualHost>
 
 <VirtualHost *:35357>
-    WSGIDaemonProcess keystone-admin processes=5 threads=1 user=keystone display-name=%{GROUP}
+    WSGIDaemonProcess keystone-admin processes=5 threads=1 user=keystone group=keystone display-name=%{GROUP}
     WSGIProcessGroup keystone-admin
-    WSGIScriptAlias / /var/www/cgi-bin/keystone/admin
+    WSGIScriptAlias / /usr/bin/keystone-wsgi-admin
     WSGIApplicationGroup %{GLOBAL}
     WSGIPassAuthorization On
     <IfVersion >= 2.4>
       ErrorLogFormat "%{cu}t %M"
     </IfVersion>
-    LogLevel info
-    ErrorLog /var/log/apache2/keystone-error.log
-    CustomLog /var/log/apache2/keystone-access.log combined
+    ErrorLog /var/log/apache2/keystone.log
+    CustomLog /var/log/apache2/keystone_access.log combined
+
+    <Directory /usr/bin>
+        <IfVersion >= 2.4>
+            Require all granted
+        </IfVersion>
+        <IfVersion < 2.4>
+            Order allow,deny
+            Allow from all
+        </IfVersion>
+    </Directory>
 </VirtualHost>
 EOF
 
 ln -s /etc/apache2/sites-available/wsgi-keystone.conf /etc/apache2/sites-enabled
-mkdir -p /var/www/cgi-bin/keystone
-curl http://git.openstack.org/cgit/openstack/keystone/plain/httpd/keystone.py?h=stable/kilo | tee /var/www/cgi-bin/keystone/main /var/www/cgi-bin/keystone/admin
-chown -R keystone:keystone /var/www/cgi-bin/keystone 
-chmod 755 /var/www/cgi-bin/keystone/*
+#mkdir -p /var/www/cgi-bin/keystone
+#curl http://git.openstack.org/cgit/openstack/keystone/plain/httpd/keystone.py?h=stable/kilo | tee /var/www/cgi-bin/keystone/main /var/www/cgi-bin/keystone/admin
+#chown -R keystone:keystone /var/www/cgi-bin/keystone 
+#chmod 755 /var/www/cgi-bin/keystone/*
 
 # Restart Apache
 service apache2 restart
 
 # Configure Endpoints
 export OS_TOKEN=$ADMIN_TOKEN
-export OS_URL=http://controller01:35357/v2.0
+export OS_URL=http://controller01:35357/v3
+export OS_IDENTITY_API_VERSION=3
 
 openstack service create --name keystone --description "OpenStack Identity" identity
 
-openstack endpoint create \
---publicurl http://controller01:5000/v2.0 \
---internalurl http://controller01:5000/v2.0 \
---adminurl http://controller01:35357/v2.0 \
---region RegionOne \
-identity
+openstack endpoint create --region RegionOne identity public http://controller01:5000/v2.0
+openstack endpoint create --region RegionOne identity internal http://controller01:5000/v2.0
+openstack endpoint create --region RegionOne identity admin http://controller01:35357/v2.0
 
 # Configure projects and users
-openstack project create --description "Admin Project" admin
-openstack project create --description "Service Project" service
-openstack project create --description "Demo Project" demo
+openstack project create --domain default --description "Admin Project" admin
+openstack project create --domain default --description "Service Project" service
+openstack project create --domain default --description "Demo Project" demo
 
-openstack user create admin --password secrete
+openstack user create --domain default --password secrete admin
 openstack role create admin
 openstack role add --project admin --user admin admin
 
-openstack user create demo --password demo
+openstack user create --domain default --password demo demo
 openstack role create user
 openstack role add --project demo --user demo user
 
@@ -137,6 +153,7 @@ export OS_TENANT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=secrete
 export OS_AUTH_URL=http://controller01:35357/v3
+export OS_IDENTITY_API_VERSION=3
 EOF
 
 cat > ~/demorc <<EOF
@@ -147,6 +164,7 @@ export OS_TENANT_NAME=demo
 export OS_USERNAME=demo
 export OS_PASSWORD=demo
 export OS_AUTH_URL=http://controller01:5000/v3
+export OS_IDENTITY_API_VERSION=3
 EOF
 
 echo;
